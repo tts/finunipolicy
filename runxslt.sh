@@ -1,6 +1,6 @@
 #!/bin/bash
 
-FILES=/u/30/sonkkila/unix/projektit/finunipolicy/data/*.zip
+FILES=/projektit/finunipolicy/data/*.zip
 
 for FILE in $FILES; do
   echo "Processing $FILE..."
