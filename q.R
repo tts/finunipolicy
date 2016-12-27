@@ -276,10 +276,25 @@ data_subset <- metrics_data[ , c("doi",
 # Join with original data 
 data_joined_with_metrics <- inner_join(data, data_subset, by = c("DOI"="doi"))
 
-metrics <- data_joined_with_metrics %>% 
+data <- data_joined_with_metrics %>% 
   mutate(University = gsub("data/|\\.csv", "", University)) %>% 
-  mutate(AltmetricsURL = details_url) %>% 
-  mutate(Score = score) %>%
+  mutate(University = gsub("Aaltoyliopisto", "Aalto University", University)) %>%
+  mutate(University = gsub("AboAkademi", "Åbo Akademi", University)) %>%
+  mutate(University = gsub("Helsinginyliopisto", "University of Helsinki", University)) %>%
+  mutate(University = gsub("ItaSuomenyliopisto", "University of Eastern Finland", University)) %>%
+  mutate(University = gsub("Jyvaskylanyliopisto", "University of Jyväskylä", University)) %>%
+  mutate(University = gsub("Lapinyliopisto", "University of Lapland", University)) %>%
+  mutate(University = gsub("Lappeenrannanteknyliopisto", "Lappeenranta University of Technology", University)) %>% 
+  mutate(University = gsub("Oulunyliopisto", "University of Oulu", University)) %>% 
+  mutate(University = gsub("Svenskahandelshogskolan", "Hanken School of Economics", University)) %>% 
+  mutate(University = gsub("Tampereenteknyliopisto", "Tampere University of Technology", University)) %>% 
+  mutate(University = gsub("Tampereenyliopisto", "University of Tampere", University)) %>% 
+  mutate(University = gsub("Turunyliopisto", "University of Turku", University)) %>% 
+  mutate(University = gsub("Vaasanyliopisto", "University of Vaasa", University)) %>% 
+  mutate(Title = gsub("'","", Title)) %>% 
+  mutate(href = details_url) %>% 
+  mutate(Link = paste0('<a href="', href, '" target="_blank"', '">', substr(href, 47, nchar(href)), '/a>')) %>% 
+  mutate(Score = as.integer(ceiling(score))) %>%
   mutate(Mendeley = mendeley) %>% 
   mutate(CiteULike = citeulike) %>% 
   mutate(Readers = readers_count) %>% 
@@ -296,21 +311,25 @@ metrics <- data_joined_with_metrics %>%
   mutate(Wikipedia = cited_by_wikipedia_count.1) %>% 
   mutate(Weibo = cited_by_weibo_count) %>% 
   mutate(Policy = cited_by_policies_count) %>% 
-  select(DOI, University, Title, Journal, Authors, OA, SubjectCount, Subjects, 
-         AltmetricsURL, Score, Mendeley, Policy, Readers, GPlus, Facebook,
-         Posts, Twitter, Accounts, Blogs, YouTube, Reddit, ResHighlight,
-         News, Wikipedia, Weibo, CiteULike)
+  mutate(OpenAccess = ifelse(data$OA == 0, "Not OA journal", 
+                             ifelse(data$OA == 0, "OA journal",
+                                    ifelse(data$OA == 0, "OA (repository)", "OA status not known")))) %>% 
+  mutate(OA = ifelse(OA == 0, 12,
+                     ifelse(OA == 0, 8,
+                            ifelse(OA == 0, 2, 1)))) %>% 
+  select(DOI, University, Link, href, Title, Journal, Authors, OA, OpenAccess, SubjectCount,  
+         Score, Mendeley, Policy, Readers, GPlus, Facebook,
+         Posts, Twitter, Accounts, Blogs, YouTube, Reddit, ResearchForums,
+         NewsOutlets, Wikipedia, Weibo, CiteULike)
 
-# OA code to text
-metrics$OA <- ifelse(metrics$OA == 0, "Not OA journal", 
-                       ifelse(metrics$OA == 1, "OA journal",
-                              ifelse(metrics$OA == 2, "OA (repository)", "OA status not known")))
 
-# Altmetric score value to ceiling 
-metrics$Score <- as.integer(ceiling(metrics$Score))
+# Removing duplicates in DOI+University combinations
+data <- data[!duplicated(data[1:2]),]
 
-# Some data is NA, some 0
-metrics[is.na(metrics)] <- 0
+# Take all the rest except DOI, links first
+data <- data[ ,c(3:4,2,5:ncol(data))]
 
-# Write to file
-write.csv(metrics, "data/metric_data_2015.csv", row.names = FALSE)
+write.csv2(metrics, "data/data_2015.csv", row.names = FALSE, fileEncoding = "UTF-8")
+
+universities <- unique(data$University)
+write.csv2(universities, "data/universities.csv", row.names = FALSE, fileEncoding = "UTF-8")
