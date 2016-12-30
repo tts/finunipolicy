@@ -311,17 +311,21 @@ data <- data_joined_with_metrics %>%
   mutate(Wikipedia = cited_by_wikipedia_count.1) %>% 
   mutate(Weibo = cited_by_weibo_count) %>% 
   mutate(Policy = cited_by_policies_count) %>% 
-  mutate(OpenAccess = ifelse(data$OA == 0, "Not OA journal", 
-                             ifelse(data$OA == 0, "OA journal",
-                                    ifelse(data$OA == 0, "OA (repository)", "OA status not known")))) %>% 
-  mutate(OA = ifelse(OA == 0, 12,
-                     ifelse(OA == 0, 8,
+  mutate(OpenAccess = ifelse(data$OA == 0, "Not OA journal",  # for textual output in data table
+                             ifelse(data$OA == 1, "OA journal",
+                                    ifelse(data$OA == 2, "OA (repository)", "OA status not known")))) %>% 
+  mutate(OA = ifelse(OA == 1, 12, # for scaling the circle size in plot
+                     ifelse(OA == 2, 8,
                             ifelse(OA == 0, 2, 1)))) %>% 
   select(DOI, University, Link, href, Title, Journal, Authors, OA, OpenAccess, SubjectCount,  
          Score, Mendeley, Policy, Readers, GPlus, Facebook,
          Posts, Twitter, Accounts, Blogs, YouTube, Reddit, ResearchForums,
          NewsOutlets, Wikipedia, Weibo, CiteULike)
 
+# 0	Ei Open access -julkaisu
+# 1	Open access -julkaisu
+# 2	Open access –julkaisu, rinnakkaistallennettu
+# 9	ei tietoa onko julkaisu Open access –julkaisu.
 
 # Removing duplicates in DOI+University combinations
 data <- data[!duplicated(data[1:2]),]
