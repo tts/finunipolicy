@@ -322,11 +322,6 @@ data <- data_joined_with_metrics %>%
          Posts, Twitter, Accounts, Blogs, YouTube, Reddit, ResearchForums,
          NewsOutlets, Wikipedia, Weibo, CiteULike)
 
-# 0	Ei Open access -julkaisu
-# 1	Open access -julkaisu
-# 2	Open access –julkaisu, rinnakkaistallennettu
-# 9	ei tietoa onko julkaisu Open access –julkaisu.
-
 # Removing duplicates in DOI+University combinations
 data <- data[!duplicated(data[1:2]),]
 
