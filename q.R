@@ -85,8 +85,7 @@ data <- data %>%
 # test <- plyr::llply(paste0('doi:',"10.1093/acprof:oso/9780199560677.003.0006"), altmetrics, .progress = 'text')
 # Fails, although ought to be a correct DOI of a book. Anyway, ":" needs to be removed
 
-data$DOI <- gsub("https://dx.doi.org/|http://dx.doi.org/", "", data$DOI)
-data$DOI <- gsub("dx.doi.org/", "", data$DOI)
+data$DOI <- gsub("https?://(dx\\.)?doi.org/", "", data$DOI)
 data$DOI <- gsub("http://doi.ieeecomputersociety.org/", "", data$DOI)
 data$DOI <- gsub("http://|https://", "", data$DOI)
 data$DOI <- gsub("[aA]vailable.*", "", data$DOI)
